@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  orderservice-db:
+    image: postgres:16-alpine
+    container_name: orderservice-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: orderservice
+      POSTGRES_USER: orderservice
+      POSTGRES_PASSWORD: orderservice
+    volumes:
+      - orderservice-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  orderservice-app:
+    build:
+      context: .
+    depends_on:
+      - orderservice-db
+    environment:
+      ORDERSERVICE_DB_URL: jdbc:postgresql://orderservice-db:5432/orderservice
+      ORDERSERVICE_DB_USERNAME: orderservice
+      ORDERSERVICE_DB_PASSWORD: orderservice
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+
+volumes:
+  orderservice-data:
+

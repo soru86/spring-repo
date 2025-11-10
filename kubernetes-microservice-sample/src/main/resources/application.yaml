@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: ${ORDERSERVICE_DB_URL:jdbc:postgresql://localhost:5432/orderservice}
+    username: ${ORDERSERVICE_DB_USERNAME:orderservice}
+    password: ${ORDERSERVICE_DB_PASSWORD:orderservice}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: orderservice
+        format_sql: true
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    schemas: orderservice
+    default-schema: orderservice
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+server:
+  port: ${SERVER_PORT:8080}
+
