@@ -1,0 +1,18 @@
+- hosts: k8s
+  become: true
+  vars:
+    kubeconfig_path: "{{ lookup('env','KUBECONFIG') }}"
+  tasks:
+    - name: Copy manifests
+      copy:
+        src: "../infra/kubernetes/stack.yml"
+        dest: "/tmp/stack.yml"
+    - name: Apply stack
+      command: "kubectl apply -f /tmp/stack.yml"
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+    - name: Apply istio resources
+      command: "kubectl apply -f ../infra/kubernetes/istio/virtual-service.yml"
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+

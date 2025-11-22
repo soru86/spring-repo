@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+    environment {
+        REGISTRY = credentials('saga-registry')
+        MVN_OPTS = '-Dmaven.test.skip=false'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Build Services') {
+            steps {
+                sh 'mvn -T 4C package -DskipTests'
+            }
+        }
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    def services = ['discovery-service','api-gateway','auth-service','order-service','inventory-service','payment-service','saga-orchestrator']
+                    services.each { svc ->
+                        sh \"\"\"\n                        docker build --build-arg SERVICE=${svc} -f infra/docker/Dockerfile -t ${REGISTRY_USR}/${svc}:$BUILD_NUMBER .\n                        echo ${REGISTRY_PSW} | docker login -u ${REGISTRY_USR} --password-stdin\n                        docker push ${REGISTRY_USR}/${svc}:$BUILD_NUMBER\n                        \"\"\"\n+                    }
+                }
+            }
+        }
+        stage('Deploy via Ansible') {
+            steps {
+                ansiblePlaybook credentialsId: 'kubeconfig', playbook: 'ansible/deploy.yml'
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline complete'
+        }
+        failure {
+            mail to: 'devops@sagademo.local', subject: \"Saga Demo build failed ${env.BUILD_NUMBER}\", body: 'Check Jenkins for details.'
+        }
+    }
+}
+

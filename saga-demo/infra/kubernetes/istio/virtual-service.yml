@@ -1,0 +1,44 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: saga-gateway
+  namespace: saga-demo
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: saga-virtual-service
+  namespace: saga-demo
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - saga-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /api
+      route:
+        - destination:
+            host: api-gateway.saga-demo.svc.cluster.local
+            port:
+              number: 80
+    - match:
+        - uri:
+            prefix: /actuator
+      route:
+        - destination:
+            host: prometheus-operated.saga-demo.svc.cluster.local
+            port:
+              number: 9090
+

@@ -1,0 +1,137 @@
+services:
+  postgres-command:
+    image: postgres:15-alpine
+    container_name: postgres-command
+    environment:
+      POSTGRES_DB: command_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-command-data:/var/lib/postgresql/data
+    networks:
+      - cqrs-network
+
+  postgres-query:
+    image: postgres:15-alpine
+    container_name: postgres-query
+    environment:
+      POSTGRES_DB: query_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-query-data:/var/lib/postgresql/data
+    networks:
+      - cqrs-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - cqrs-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - cqrs-network
+
+  service-registry:
+    build:
+      context: ./service-registry
+      dockerfile: Dockerfile
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - cqrs-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_HOST: service-registry
+    depends_on:
+      - service-registry
+    networks:
+      - cqrs-network
+
+  command-service:
+    build:
+      context: ./command-service
+      dockerfile: Dockerfile
+    container_name: command-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: postgres-command
+      DB_PORT: 5432
+      DB_NAME: command_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_HOST: service-registry
+    depends_on:
+      - postgres-command
+      - kafka
+      - service-registry
+    networks:
+      - cqrs-network
+
+  query-service:
+    build:
+      context: ./query-service
+      dockerfile: Dockerfile
+    container_name: query-service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: postgres-query
+      DB_PORT: 5432
+      DB_NAME: query_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EUREKA_HOST: service-registry
+    depends_on:
+      - postgres-query
+      - kafka
+      - service-registry
+    networks:
+      - cqrs-network
+
+volumes:
+  postgres-command-data:
+  postgres-query-data:
+
+networks:
+  cqrs-network:
+    driver: bridge
+

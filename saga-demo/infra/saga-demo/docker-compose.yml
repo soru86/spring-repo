@@ -1,0 +1,164 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: saga-postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - saga-postgres-data:/var/lib/postgresql/data
+      - ../postgres/seed-data.sql:/docker-entrypoint-initdb.d/seed-data.sql:ro
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+
+  discovery-service:
+    build:
+      context: ../..
+      dockerfile: infra/saga-demo/Dockerfile
+      args:
+        SERVICE: discovery-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8761:8761"
+    depends_on:
+      - postgres
+
+  api-gateway:
+    build:
+      context: ../..
+      dockerfile: infra/saga-demo/Dockerfile
+      args:
+        SERVICE: api-gateway
+    environment:
+      JWT_SECRET_BASE64: bG9jYWwtc2FnYS1zZWNyZXQtbG9uZw==
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-service
+
+  auth-service:
+    build:
+      context: ../..
+      dockerfile: infra/saga-demo/Dockerfile
+      args:
+        SERVICE: auth-service
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "8090:8090"
+    depends_on:
+      - postgres
+      - discovery-service
+
+  order-service:
+    build:
+      context: ../..
+      dockerfile: infra/saga-demo/Dockerfile
+      args:
+        SERVICE: order-service
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      KAFKA_BOOTSTRAP: kafka:9092
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - kafka
+      - discovery-service
+
+  inventory-service:
+    build:
+      context: ../..
+      dockerfile: infra/saga-demo/Dockerfile
+      args:
+        SERVICE: inventory-service
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - discovery-service
+
+  payment-service:
+    build:
+      context: ../..
+      dockerfile: infra/saga-demo/Dockerfile
+      args:
+        SERVICE: payment-service
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+      - discovery-service
+
+  saga-orchestrator:
+    build:
+      context: ../..
+      dockerfile: infra/saga-demo/Dockerfile
+      args:
+        SERVICE: saga-orchestrator
+    environment:
+      KAFKA_BOOTSTRAP: kafka:9092
+      SAGA_INTERNAL_TOKEN: local-internal-token
+    ports:
+      - "8084:8084"
+    depends_on:
+      - kafka
+      - discovery-service
+
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api-gateway
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  saga-postgres-data:
+
+

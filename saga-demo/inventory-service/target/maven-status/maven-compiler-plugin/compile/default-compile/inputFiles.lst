@@ -1,0 +1,7 @@
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/inventory-service/src/main/java/com/sagademo/inventory/InventoryServiceApplication.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/inventory-service/src/main/java/com/sagademo/inventory/application/InventoryWorkflowService.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/inventory-service/src/main/java/com/sagademo/inventory/config/JwtDecoderConfig.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/inventory-service/src/main/java/com/sagademo/inventory/config/SecurityConfig.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/inventory-service/src/main/java/com/sagademo/inventory/domain/InventoryItem.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/inventory-service/src/main/java/com/sagademo/inventory/domain/InventoryRepository.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/inventory-service/src/main/java/com/sagademo/inventory/web/InventoryController.java

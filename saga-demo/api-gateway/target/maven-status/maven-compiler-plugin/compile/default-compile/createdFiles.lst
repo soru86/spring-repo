@@ -1,0 +1,4 @@
+com/sagademo/gateway/ApiGatewayApplication.class
+com/sagademo/gateway/config/JwtDecoderConfig.class
+com/sagademo/gateway/config/SecurityConfig.class
+com/sagademo/gateway/web/FallbackController.class

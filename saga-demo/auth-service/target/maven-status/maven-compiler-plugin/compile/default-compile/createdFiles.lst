@@ -1,0 +1,7 @@
+com/sagademo/auth/AuthServiceApplication.class
+com/sagademo/auth/domain/UserAccount.class
+com/sagademo/auth/service/AuthTokenService.class
+com/sagademo/auth/domain/UserAccountRepository.class
+com/sagademo/auth/config/SecurityConfig.class
+com/sagademo/auth/web/AuthController.class
+com/sagademo/auth/web/dto/LoginRequest.class

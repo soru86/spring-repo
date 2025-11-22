@@ -1,0 +1,4 @@
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/api-gateway/src/main/java/com/sagademo/gateway/ApiGatewayApplication.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/api-gateway/src/main/java/com/sagademo/gateway/config/JwtDecoderConfig.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/api-gateway/src/main/java/com/sagademo/gateway/config/SecurityConfig.java
+/Users/soru86/Documents/ALL_WORK/ALL_CODE/spring-repo/saga-demo/api-gateway/src/main/java/com/sagademo/gateway/web/FallbackController.java

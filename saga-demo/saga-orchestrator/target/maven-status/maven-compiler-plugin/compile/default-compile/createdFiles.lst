@@ -1,0 +1,5 @@
+com/sagademo/orchestrator/config/WebClientConfig.class
+com/sagademo/orchestrator/application/SagaCoordinator$ApiSuccess.class
+com/sagademo/orchestrator/config/SecurityConfig.class
+com/sagademo/orchestrator/application/SagaCoordinator.class
+com/sagademo/orchestrator/SagaOrchestratorApplication.class

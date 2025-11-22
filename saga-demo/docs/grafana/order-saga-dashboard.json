@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "title": "Saga Demo Dashboard",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Orders Throughput",
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"order-service\",uri=\"/orders\",method=\"POST\"}[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Circuit Breaker State",
+      "targets": [
+        {
+          "expr": "resilience4j_circuitbreaker_state{application=\"saga-orchestrator\"}",
+          "refId": "B"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}
+

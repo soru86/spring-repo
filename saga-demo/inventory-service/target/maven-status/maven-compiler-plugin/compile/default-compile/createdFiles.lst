@@ -1,0 +1,7 @@
+com/sagademo/inventory/domain/InventoryItem.class
+com/sagademo/inventory/config/SecurityConfig.class
+com/sagademo/inventory/InventoryServiceApplication.class
+com/sagademo/inventory/web/InventoryController.class
+com/sagademo/inventory/config/JwtDecoderConfig.class
+com/sagademo/inventory/application/InventoryWorkflowService.class
+com/sagademo/inventory/domain/InventoryRepository.class

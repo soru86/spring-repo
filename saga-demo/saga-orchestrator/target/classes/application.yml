@@ -1,0 +1,45 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: saga-orchestrator
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:kafka:9092}
+    consumer:
+      group-id: saga-orchestrator
+      auto-offset-reset: latest
+      properties:
+        spring.json.trusted.packages: '*'
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      max-poll-records: 1
+      spring:
+        json:
+          value:
+            default:
+              type: com.sagademo.common.messaging.SagaEvent
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: ${JWT_SECRET_BASE64:bG9jYWwtc2FnYS1zZWNyZXQtbG9uZw==}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:eureka@discovery-service:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+saga:
+  internal-token: ${SAGA_INTERNAL_TOKEN:local-internal-token}
+
+logging:
+  pattern:
+    console: '{"ts":"%d{ISO8601}","level":"%p","logger":"%c{1}","msg":"%m"}%n'
+

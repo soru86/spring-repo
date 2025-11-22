@@ -1,0 +1,47 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${AUTH_DB:saga_auth}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:eureka@discovery-service:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+saga:
+  security:
+    jwt:
+      secret: ${JWT_SECRET_BASE64:bG9jYWwtc2FnYS1zZWNyZXQtbG9uZw==}
+
+logging:
+  pattern:
+    console: '{"ts":"%d{ISO8601}","level":"%p","logger":"%c{1}","msg":"%m"}%n'
+

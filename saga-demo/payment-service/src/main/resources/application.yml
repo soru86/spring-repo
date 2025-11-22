@@ -1,0 +1,38 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${PAYMENT_DB:saga_payment}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: ${JWT_SECRET_BASE64:bG9jYWwtc2FnYS1zZWNyZXQtbG9uZw==}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:eureka@discovery-service:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+springdoc:
+  api-docs.path: /v3/api-docs
+  swagger-ui.path: /swagger-ui.html
+
+logging:
+  pattern:
+    console: '{"ts":"%d{ISO8601}","level":"%p","logger":"%c{1}","msg":"%m"}%n'
+

@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - name: CircuitBreaker
+          args:
+            name: defaultCircuitBreaker
+            fallbackUri: forward:/fallback
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: ${JWT_SECRET_BASE64:bG9jYWwtc2FnYS1zZWNyZXQtbG9uZw==}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:eureka@discovery-service:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  pattern:
+    console: '{"ts":"%d{ISO8601}","level":"%p","logger":"%c{1}","msg":"%m","trace":"%X{traceId:-}","span":"%X{spanId:-}"}%n'
+

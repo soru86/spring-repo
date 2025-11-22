@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "Saga Demo Collection",
+    "_postman_id": "b9c5b36f-1234-4f61-9bc4-collection",
+    "description": "Requests for JWT auth, order saga flow",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Obtain Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"demo\",\n    \"password\": \"demo123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8090/auth/token",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8090",
+          "path": [
+            "auth",
+            "token"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"cust-100\",\n  \"totalAmount\": 120.50,\n  \"items\": [\n    {\"sku\": \"SKU-BOOK-001\", \"quantity\": 1, \"price\": 20.5},\n    {\"sku\": \"SKU-LAPTOP-003\", \"quantity\": 1, \"price\": 100}\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/orders",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "orders"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
+
